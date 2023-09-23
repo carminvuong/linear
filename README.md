@@ -3,7 +3,6 @@
 for Mr. Honner's Linear Algebra Class
 
 ## Features
-<hr>
 <ul> 
     <li>can display the matrix </li>
     <li>can interchange any two rows</li>

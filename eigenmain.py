@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image as im
+import utils
 
 def load_data(filename): # filename is a string with the filename
     raw_data = np.genfromtxt(filename, delimiter=',')
@@ -61,8 +62,16 @@ def reconstruct_one(weights, eigenfaces, meaned):
 
 if __name__ == "__main__":
     data = load_data("olivetti.csv")
-    eigenfaces, S, meaned = find_eigenfaces(data, 100)
-    # show_eigenfaces(eigenfaces, S)
-    w = one_weight(data[0], eigenfaces)
+    me = utils.convert("white.png")
+    eigenfaces, S, meaned = find_eigenfaces(data, 200)
+    # # show_eigenfaces(eigenfaces, S)
+    w = one_weight(me, eigenfaces)
     r = reconstruct_one(w, eigenfaces, meaned)
     show_face(r)
+
+    # ph = utils.convert("ph.png")
+    # eigenfaces, S, meaned = find_eigenfaces(data, 200)
+    # # # show_eigenfaces(eigenfaces, S)
+    # w = one_weight(ph, eigenfaces)
+    # r = reconstruct_one(w, eigenfaces, meaned)
+    # show_face(r)

@@ -22,7 +22,7 @@ def find_eigenfaces(data, num): # finding first num eigenvalues based on SVD
     U, S, V = np.linalg.svd(meaned.T)
     # S are the singular values in decreasing order and U are the eigenfaces
     # print(U.shape)
-    return U[:, 0:num], S, mean_face # every row, 0 - num columns AND the singular values AND mean_face
+    return U[:, 0:num], S, mean_face, meaned # every row, 0 - num columns AND the singular values AND mean_face
 
 def show_eigenfaces(eigenfaces, S): # eigenfaces is (4096 x num)
     rows, cols = eigenfaces.shape # rows is 4096
@@ -36,13 +36,13 @@ def show_eigenfaces(eigenfaces, S): # eigenfaces is (4096 x num)
 
     plt.show()
 
-def show_face(face): # eigenfaces is (4096 x num)
+def show_face(face, label): # eigenfaces is (4096 x num)
     fig, axes = plt.subplots(1, 1, figsize=(10, 4))
     ax = axes
     ef = face.reshape(64, 64)
     ax.imshow(ef, cmap="gray")
     ax.axis("off")
-    ax.set_title("face")
+    ax.set_title(label)
 
     plt.show()
 
@@ -55,23 +55,36 @@ def one_weight(face_data, eigenfaces):
 
 def reconstruct_one(weights, eigenfaces, meaned):
     # print((np.matmul(weights, eigenfaces.T) + meaned).shape)
-    print(weights.shape)
-    print(eigenfaces.shape)
-    print(meaned.shape)
+    # print(weights.shape)
+    # print(eigenfaces.shape)
+    # print(meaned.shape)
     return np.matmul(weights.T, eigenfaces.T) + meaned
+
+def best_match(face, eigenfaces, all_weights, all_faces):
+    mean_face = np.average(all_faces, axis=0)
+    self_weight = one_weight(face-mean_face, eigenfaces)
+    all_diffs = all_weights - self_weight
+    squared = all_diffs ** 2 # square so all entries are positive
+    summed = squared.sum(axis=1) # will be a column vector
+
+    # the smallest summed squared distance will mean the closest match
+    
+    i = np.argmin(summed)
+    print(summed[i])
+    print("index of best match face:", i)
+    return all_faces[i]
+    
 
 if __name__ == "__main__":
     data = load_data("olivetti.csv")
-    me = utils.convert("white.png")
-    eigenfaces, S, meaned = find_eigenfaces(data, 200)
-    # # show_eigenfaces(eigenfaces, S)
-    w = one_weight(me, eigenfaces)
+    me = utils.convert("me.jpg")
+    eigenfaces, S, meaned, all_meaned = find_eigenfaces(data, 20)
+    # show_eigenfaces(eigenfaces, S)
+    w = one_weight(me-meaned, eigenfaces)
     r = reconstruct_one(w, eigenfaces, meaned)
-    show_face(r)
-
-    # ph = utils.convert("ph.png")
-    # eigenfaces, S, meaned = find_eigenfaces(data, 200)
-    # # # show_eigenfaces(eigenfaces, S)
-    # w = one_weight(ph, eigenfaces)
-    # r = reconstruct_one(w, eigenfaces, meaned)
+    all_w = all_weights(all_meaned, eigenfaces)
+    
+    # print(data[0].shape)
+    best_face = best_match(me, eigenfaces, all_w, data)
+    show_face(best_face, "best match")
     # show_face(r)

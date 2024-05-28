@@ -24,10 +24,10 @@ def find_eigenfaces(data, num): # finding first num eigenvalues based on SVD
     # print(U.shape)
     return U[:, 0:num], S, mean_face, meaned # every row, 0 - num columns AND the singular values AND mean_face
 
-def show_eigenfaces(eigenfaces, S): # eigenfaces is (4096 x num)
+def show_eigenfaces(eigenfaces, S): # eigenfaces is (4096 x num) # shows first 10
     rows, cols = eigenfaces.shape # rows is 4096
     fig, axes = plt.subplots(1, cols, figsize=(15, 8))
-    for col in range(cols):
+    for col in range(10):
         ax = axes[col]
         ef = eigenfaces[:, col].reshape(64, 64)
         ax.imshow(ef, cmap="gray")
@@ -76,15 +76,50 @@ def best_match(face, eigenfaces, all_weights, all_faces):
     
 
 if __name__ == "__main__":
-    data = load_data("olivetti.csv")
-    me = utils.convert("me.jpg")
-    eigenfaces, S, meaned, all_meaned = find_eigenfaces(data, 20)
-    # show_eigenfaces(eigenfaces, S)
-    w = one_weight(me-meaned, eigenfaces)
-    r = reconstruct_one(w, eigenfaces, meaned)
-    all_w = all_weights(all_meaned, eigenfaces)
+    # data = load_data("olivetti.csv")
+    # me = utils.convert("me.jpg")
+    # eigenfaces, S, meaned, all_meaned = find_eigenfaces(data, 10)
+    # # show_eigenfaces(eigenfaces, S)
+
+    # w = one_weight(me-meaned, eigenfaces)
+    # r = reconstruct_one(w, eigenfaces, meaned)
+    # # all_w = all_weights(all_meaned, eigenfaces)
     
-    # print(data[0].shape)
-    best_face = best_match(me, eigenfaces, all_w, data)
-    show_face(best_face, "best match")
-    # show_face(r)
+    # print(w)
+    # # print(data[0].shape)
+    # # best_face = best_match(me, eigenfaces, all_w, data)
+    # # show_face(best_face, "best match")
+    # show_face(r, "20")
+
+    # putting my face in the dataset
+    # showiong my faces
+    # fig, axes = plt.subplots(1, 10, figsize=(15, 8))
+    # for i in range(1, 11):
+    #     me = utils.convert(str(i)+".jpg")
+    #     ax = axes[i-1]
+    #     face = me.reshape(64, 64)
+    #     ax.imshow(face, cmap='gray')
+    #     ax.axis('off')
+    #     ax.set_title(f'me {i}')
+    
+
+    # plt.show()
+
+    # working with new dataset
+    data = load_data("olivetti_clone.csv")
+    # print(data.shape)
+
+    eigenfaces, S, mean_face, all_meaned = find_eigenfaces(data, 300)
+    # show_eigenfaces(eigenfaces, S) # shows eigenfaces along with their singular values
+
+    # let's find the weights for one of my faces
+    me = utils.convert("test_3.jpg")
+    # show_face(me, "me")
+    weights = one_weight(me, eigenfaces)
+    reconstructed = reconstruct_one(weights, eigenfaces, mean_face)
+    # show_face(reconstructed, "reconstructed me")
+
+    all_ws = all_weights(all_meaned, eigenfaces)
+    best_face = best_match(me, eigenfaces, all_ws, data)
+
+    show_face(best_face, "best approximation")

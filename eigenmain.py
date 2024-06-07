@@ -46,7 +46,7 @@ def show_face(face, label): # eigenfaces is (4096 x num)
 
     plt.show()
 
-def all_weights(meaned_data, eigenfaces): # matrix for weights of ALL faces (using dot producting to find a weight) should be (410 x 4096)
+def all_weights(meaned_data, eigenfaces): # weights matrix of ALL faces (using dot product to find a weight) should be (410 x 4096)
     return np.matmul(meaned_data, eigenfaces)
     # (410 x 4096) * (4096 * num) = (410 * num) = 410 row vector with num entries cuz its 1 for each eigenface
 
@@ -64,62 +64,48 @@ def best_match(face, eigenfaces, all_weights, all_faces):
     mean_face = np.average(all_faces, axis=0)
     self_weight = one_weight(face-mean_face, eigenfaces)
     all_diffs = all_weights - self_weight
-    squared = all_diffs ** 2 # square so all entries are positive
+    squared = all_diffs ** 2 # squared so all entries are positive
+
     summed = squared.sum(axis=1) # will be a column vector
 
     # the smallest summed squared distance will mean the closest match
-    
     i = np.argmin(summed)
-    print(summed[i])
+    print("sum of squares: ", summed[i])
     print("index of best match face:", i)
     return all_faces[i]
     
 
 if __name__ == "__main__":
-    # data = load_data("olivetti.csv")
-    # me = utils.convert("me.jpg")
-    # eigenfaces, S, meaned, all_meaned = find_eigenfaces(data, 10)
-    # # show_eigenfaces(eigenfaces, S)
-
-    # w = one_weight(me-meaned, eigenfaces)
-    # r = reconstruct_one(w, eigenfaces, meaned)
-    # # all_w = all_weights(all_meaned, eigenfaces)
-    
-    # print(w)
-    # # print(data[0].shape)
-    # # best_face = best_match(me, eigenfaces, all_w, data)
-    # # show_face(best_face, "best match")
-    # show_face(r, "20")
-
-    # putting my face in the dataset
-    # showiong my faces
-    # fig, axes = plt.subplots(1, 10, figsize=(15, 8))
-    # for i in range(1, 11):
-    #     me = utils.convert(str(i)+".jpg")
-    #     ax = axes[i-1]
-    #     face = me.reshape(64, 64)
-    #     ax.imshow(face, cmap='gray')
-    #     ax.axis('off')
-    #     ax.set_title(f'me {i}')
-    
-
-    # plt.show()
-
-    # working with new dataset
+    # olivetti_clone.csv is a CSV file with all the data
+    # "data" is the matrix with all the data on it
     data = load_data("olivetti_clone.csv")
-    # print(data.shape)
 
-    eigenfaces, S, mean_face, all_meaned = find_eigenfaces(data, 300)
-    # show_eigenfaces(eigenfaces, S) # shows eigenfaces along with their singular values
+    # converts an image into a vector
+    me = utils.convert("test_me.jpg") 
 
-    # let's find the weights for one of my faces
-    me = utils.convert("test_3.jpg")
-    # show_face(me, "me")
-    weights = one_weight(me, eigenfaces)
-    reconstructed = reconstruct_one(weights, eigenfaces, mean_face)
-    # show_face(reconstructed, "reconstructed me")
+    # in this case, "eigenfaces" is a (4096x200) matrix containing 200 eigenfaces
+    # "S" are the singular values as a list
+    # "meaned" is the mean face 
+    # "all_meaned" is the mean-centered data
+    eigenfaces, S, meaned, all_meaned = find_eigenfaces(data, 200)
 
-    all_ws = all_weights(all_meaned, eigenfaces)
-    best_face = best_match(me, eigenfaces, all_ws, data)
+    # "all_w" is the weights matrix
+    all_w = all_weights(all_meaned, eigenfaces)
+    
+    # best_face is the face that is "closest" to our testing image
+    best_face = best_match(me, eigenfaces, all_w, data)
 
-    show_face(best_face, "best approximation")
+    fig, axes = plt.subplots(1, 2, figsize=(15, 8))
+    ax = axes[0]
+    face = me.reshape(64, 64)
+    ax.imshow(face, cmap='gray')
+    ax.axis('off')
+    ax.set_title(f'me')
+
+    ax = axes[1]
+    face = best_face.reshape(64, 64)
+    ax.imshow(face, cmap='gray')
+    ax.axis('off')
+    ax.set_title(f'best match')
+
+    plt.show()

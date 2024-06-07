@@ -1,12 +1,11 @@
-# Computing - Matrices and Lists
+# Eigenfaces
 
-for Mr. Honner's Linear Algebra Class
+for a Linear Algebra Final Project
 
-## Features
-<ul> 
-    <li>can display the matrix </li>
-    <li>can interchange any two rows</li>
-    <li>can scale any row by a constant </li>
-    <li>can add multiple of a row to another row</li>
 
-</ul>
+### install dependencies
+install all the stuff in ```requirements.txt```
+
+### running the program
+running ```python3 eigenmain.py``` will run the main program <br>
+it will find a best matching face that is in the dataset using an input face (called ```test_me.jpg```)

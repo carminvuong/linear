@@ -71,7 +71,6 @@ def best_match(face, eigenfaces, all_weights, all_faces):
     # the smallest summed squared distance will mean the closest match
     i = np.argmin(summed)
     print("sum of squares: ", summed[i])
-    print("index of best match face:", i)
     return all_faces[i]
     
 
